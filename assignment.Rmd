@@ -1,0 +1,130 @@
+---
+title: "assignment_"
+author: "Aditi Dayal"
+date: "2026-02-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+---
+
+# 1️⃣ Load Data
+```{r load-data}
+data <- read.csv("activity.csv")
+head(data)
+```
+
+
+---
+
+# 2️⃣ Plot 1 — Histogram of total steps per day
+```{r plot1}
+total_steps <- aggregate(steps ~ date, data, sum, na.rm = TRUE)
+
+hist(total_steps$steps,
+     main = "Total Steps per Day",
+     xlab = "Total Steps",
+     col = "lightblue")
+```
+
+---
+
+# 3️⃣ Plot 2 — Average daily activity pattern
+```r
+```{r plot2}
+interval_avg <- aggregate(steps ~ interval, data, mean, na.rm = TRUE)
+
+plot(interval_avg$interval,
+     interval_avg$steps,
+     type = "l",
+     xlab = "5-minute Interval",
+     ylab = "Average Steps",
+     main = "Average Daily Activity Pattern")
+```
+     
+
+---
+
+# 4️⃣ Handle Missing Values
+```r
+```{r impute}
+data_filled <- data
+
+for (i in 1:nrow(data_filled)) {
+  if (is.na(data_filled$steps[i])) {
+    data_filled$steps[i] <- interval_avg$steps[
+      interval_avg$interval == data_filled$interval[i]
+    ]
+  }
+}
+```
+
+
+---
+
+# 5️⃣ Plot 3 — Histogram after filling missing values
+```r
+```{r plot3}
+total_steps_filled <- aggregate(steps ~ date, data_filled, sum)
+
+hist(total_steps_filled$steps,
+     main = "Total Steps per Day (After Imputation)",
+     xlab = "Total Steps",
+     col = "lightgreen")
+```
+     
+
+---
+
+# 6️⃣ Plot 4 — Weekday vs Weekend activity pattern
+```r
+```{r plot4}
+data_filled$date <- as.Date(data_filled$date)
+
+data_filled$day_type <- ifelse(
+  weekdays(data_filled$date) %in% c("Saturday","Sunday"),
+  "weekend","weekday"
+)
+
+library(lattice)
+
+interval_daytype <- aggregate(steps ~ interval + day_type,
+                              data_filled,
+                              mean)
+
+xyplot(steps ~ interval | day_type,
+       data = interval_daytype,
+       type = "l",
+       layout = c(1,2),
+       xlab = "Interval",
+       ylab = "Average Steps")
+```
+
+     
+
+
+
